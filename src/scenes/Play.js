@@ -1,11 +1,13 @@
-//Bonus Mods thus far 1/26
+//Bonus Mods thus far 1/29
 //Added four new sound effects that play at random +3
 //Altered menu to include personal photo and changed font +3
 //Display countdonwn timer +3
 //Added bonus and penalty to score +5
-//Not Implemented Yet: Create new rocket that is faster
-//Possible create background track 
-
+//Create new rocket that is faster +5
+//Create background track + 1 
+//Added a Google Font to menu screen "Blaster"
+//Shrank the hit box size on BatRocket to make hits
+//more realistic
 
 
 
@@ -16,6 +18,17 @@ class Play extends Phaser.Scene {
     }
 
     create(){
+
+        //start background music and check if it is still playing, having
+        //issues with music coming back on when restarting and overlapping if
+        //it just keeps playing
+        let bgMusic = this.sound.get('Project3BG')
+        if(!bgMusic || !bgMusic.isPlaying){
+            if(!bgMusic){
+                bgMusic = this.sound.add('Project3BG', { loop: true })
+            }
+            bgMusic.play()
+        }
 
         //place tile sprite
         this.starfield = this.add.tileSprite(0,0,640,480, 'starfield').setOrigin(0,0)
@@ -40,8 +53,16 @@ class Play extends Phaser.Scene {
             0,30).setOrigin(0,0)
         this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + 
             borderPadding*2, 'spaceship', 0, 20).setOrigin(0,0)
-        this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship',
-            0,10).setOrigin(0,0)
+
+        //Created new ship that looks like a bat
+        //increased it's velocity and made it smaller
+        //also increase point value when hit
+
+        this.ship03 = new BatRocket(this, game.config.width, borderUISize*6 + borderPadding*4, 'batrocket',
+            0,25).setOrigin(0,0)
+        this.ship03.moveSpeed = 6
+        this.ship03.setSize(40, 20)
+        this.ship03.setScale(0.7)
         
 
         //define keys
@@ -82,6 +103,9 @@ class Play extends Phaser.Scene {
         //60 second play clock
         scoreConfig.fixedWidth = 0
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
+            // stop background music when game ends, otherwise it overlaps
+            this.sound.stopByKey('Project3BG')
+            
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5)
             this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5)
             this.gameOver = true
@@ -92,11 +116,14 @@ class Play extends Phaser.Scene {
 
         //check key input for restart
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)){
+            this.sound.stopByKey('Project3BG')
             this.scene.restart()
         }
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)){
+            this.sound.stopByKey('Project3BG')
             this.scene.start('menuScene')
         }
+
 
         this.starfield.tilePositionX -= 4
         if(!this.gameOver){
@@ -189,7 +216,8 @@ class Play extends Phaser.Scene {
         this.p1Score += ship.points
         this.scoreLeft.text = this.p1Score
         
-        // add bonus time on successful hit (1 second = 1000ms)
+        // add bonus time on successful hit, had to add new text
+        // still slightly buggy
         let remainingTime = this.clock.getRemaining()
         let bonusTime = 3000 // 3 second bonus
         this.clock.remove()
