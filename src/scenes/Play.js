@@ -9,6 +9,12 @@
 //Shrank the hit box size on BatRocket to make hits
 //more realistic
 
+// I watched a few videos from YouTuber lowpolyprincess who does
+//very easy to follow Phaser tutorials, in particular
+//Phaser Tutorial: Make Your First 2D Javascript Game
+//https://www.youtube.com/watch?v=0qtg-9M3peI
+
+
 
 
 
