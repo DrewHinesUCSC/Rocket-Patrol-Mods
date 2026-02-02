@@ -1,3 +1,7 @@
+//Attempted some fixes for buggy Pages, it broke the game and i am unsure if it is game or 
+//browser issues, reverting back to previous version
+
+
 class Play extends Phaser.Scene {
     constructor() {
         super("playScene");
