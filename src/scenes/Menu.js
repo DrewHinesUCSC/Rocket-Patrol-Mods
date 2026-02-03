@@ -52,11 +52,13 @@ preload(){
         
 
         //animation configuration
-        this.anims.create({
-            key: 'explode',
-            frames: this.anims.generateFrameNumbers('explosion',{start: 0, end: 9, first: 0}),
-            frameRate: 30
-        })
+        if (!this.anims.exists('explode')) {
+            this.anims.create({
+                key: 'explode',
+                frames: this.anims.generateFrameNumbers('explosion',{start: 0, end: 9, first: 0}),
+                frameRate: 30
+            })
+        }
 
         let menuConfig = {
             fontFamily: 'Bangers',
@@ -91,6 +93,7 @@ preload(){
                 gameTimer: 60000
             }
             this.sound.play('sfx-select')
+            this.sound.stopAll()
             this.scene.start('playScene')
         }
         if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){

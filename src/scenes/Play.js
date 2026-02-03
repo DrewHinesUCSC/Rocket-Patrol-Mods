@@ -12,11 +12,12 @@ class Play extends Phaser.Scene {
         //start background music and check if it is still playing, having
         //issues with music coming back on when restarting and overlapping if
         //it just keeps playing
+        this.sound.stopAll() // Stop any music from menu
         let bgMusic = this.sound.get('Project3BG')
-        if(!bgMusic || !bgMusic.isPlaying){
-            if(!bgMusic){
-                bgMusic = this.sound.add('Project3BG', { loop: true })
-            }
+        if(!bgMusic){
+            bgMusic = this.sound.add('Project3BG', { loop: true })
+        }
+        if(!bgMusic.isPlaying){
             bgMusic.play()
         }
 
@@ -41,8 +42,10 @@ class Play extends Phaser.Scene {
         //add 3 spaceships
         this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship',
             0,30).setOrigin(0,0)
+        this.ship01.isExploding = false
         this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + 
             borderPadding*2, 'spaceship', 0, 20).setOrigin(0,0)
+        this.ship02.isExploding = false
 
         //Created new ship that looks like a bat
         //increased it's velocity and made it smaller
@@ -50,6 +53,7 @@ class Play extends Phaser.Scene {
 
         this.ship03 = new BatRocket(this, game.config.width, borderUISize*6 + borderPadding*4, 'batrocket',
             0,25).setOrigin(0,0)
+        this.ship03.isExploding = false
         this.ship03.moveSpeed = 6
         this.ship03.setSize(40, 20)
         this.ship03.setScale(0.7)
@@ -126,16 +130,16 @@ class Play extends Phaser.Scene {
         this.timeLeft.text = Math.ceil(this.clock.getRemaining() / 1000)
         }
 
-        //check collisions
-        if(this.checkCollision(this.p1Rocket, this.ship03)){
+        //check collisions and added flag for frame refresh on github pages
+        if(this.checkCollision(this.p1Rocket, this.ship03) && !this.ship03.isExploding){
             this.p1Rocket.reset()
             this.shipExplode(this.ship03)
         }
-        else if(this.checkCollision(this.p1Rocket, this.ship02)){
+        else if(this.checkCollision(this.p1Rocket, this.ship02) && !this.ship02.isExploding){
             this.p1Rocket.reset()
             this.shipExplode(this.ship02)
         }
-        else if(this.checkCollision(this.p1Rocket, this.ship01)){
+        else if(this.checkCollision(this.p1Rocket, this.ship01) && !this.ship01.isExploding){
             this.p1Rocket.reset()
             this.shipExplode(this.ship01)
         }
@@ -193,6 +197,7 @@ class Play extends Phaser.Scene {
 
     shipExplode(ship){
         //temporarily hidde ship
+        ship.isExploding = true
         ship.alpha = 0
         //create explosion at ship position
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0,0);
@@ -200,6 +205,7 @@ class Play extends Phaser.Scene {
         boom.on('animationcomplete', () => {    //callback after anim completes
             ship.reset()                        //reset ship position
             ship.alpha = 1                      //make ship visible again
+            ship.isExploding = false            //allow collision again
             boom.destroy()                      //remove explosion sprite
         })
         //score add and text update
